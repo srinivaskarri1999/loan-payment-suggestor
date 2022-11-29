@@ -1,4 +1,4 @@
-import { getEntireSuggestions } from '../util'
+import { getEntireSuggestions } from '../helpers/suggestions'
 
 export const suggestionInitialValues = {
   repayAmount: undefined,
@@ -37,15 +37,14 @@ export const getRepaySchedule = (loans, repay) => {
     let saved = 0
     loans.forEach((loan) => {
       if (suggestion.repayScheme[loan.id]) {
-        row.push(suggestion.repayScheme[loan.id].repayAmount || '--')
+        row.push(suggestion.repayScheme[loan.id].repayAmount || '-')
         saved += suggestion.repayScheme[loan.id].saved || 0
       } else {
-        row.push('--')
+        row.push('-')
       }
     })
     row.push(saved)
     data.push(row)
   })
-  console.log('Date:', data)
   return data
 }
