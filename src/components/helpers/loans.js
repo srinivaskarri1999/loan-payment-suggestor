@@ -7,7 +7,7 @@ export const calculateEmi = (principle, interest, loanTenure) => {
   const m = (1 + r) ** n
   const emi = (p * r * m) / (m - 1)
 
-  return roundTwoDecimals(emi)
+  return emi
 }
 
 export const getLoansEndDate = (loans) => {
@@ -22,21 +22,19 @@ export const getLoansEndDate = (loans) => {
   return endDate
 }
 
-export const getLoanTenure = (amount, interestRate, emi) => {
+export const getLoanStats = (amount, interestRate, emi) => {
   let loanTenure = 0
-  while (amount > 0) {
+  let paid = 0
+  if (amount <= 0) {
+    return { loanTenure, paid }
+  }
+  while (amount > 0.1) {
     amount += (amount * interestRate) / 1200
+    paid += Math.min(emi, amount)
     amount -= emi
     loanTenure++
   }
-  return loanTenure
-}
-
-export const totalPaid = (principle, interestRate, loanTenure) => {
-  if (!principle || !loanTenure) {
-    return 0
-  }
-  return calculateEmi(principle, interestRate, loanTenure) * loanTenure
+  return { loanTenure, paid }
 }
 
 export const getPrincipleDue = (loan, currentDate) => {
@@ -113,7 +111,11 @@ export const applyRepayScheme = (loans, repayScheme, date) => {
         0,
         loan.amount + interest - loan.emi - repayAmount
       )
-      const loanTenure = getLoanTenure(amount, loan.interestRate, loan.emi)
+      const loanTenure = getLoanStats(
+        amount,
+        loan.interestRate,
+        loan.emi
+      ).loanTenure
       if (!amount || !loanTenure) {
         return null
       }
