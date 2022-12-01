@@ -1,4 +1,4 @@
-import { monthsDifference, monthsIncrease, roundTwoDecimals } from './util'
+import { monthsDifference, monthsIncrease } from './util'
 import {
   adjustLoans,
   applyPrepaymentCharges,
@@ -65,100 +65,67 @@ const getSavedAmount = (loans, repayScheme, date) => {
 }
 
 export const getDateSuggestion = (loans, repayAmount, date) => {
-  let maxSaving = 0
-  let maxRepayScheme = {}
+  let finalRepayScheme = {}
+  let amountRemaining = repayAmount
+  let prevAmountRem = 0
 
-  loans.forEach((loan) => {
-    const repayScheme = {
-      [loan.id]: {
-        repayAmount: Math.min(repayAmount, Math.max(loan.amount - loan.emi, 0)),
-        saved: 0,
-      },
-    }
-    const saving = getSavedAmount(loans, repayScheme, date)
-    repayScheme[loan.id].saved = roundTwoDecimals(saving)
-    if (saving > maxSaving) {
-      maxSaving = saving
-      maxRepayScheme = repayScheme
-    }
-  })
+  while (amountRemaining > 0.1 && prevAmountRem !== amountRemaining) {
+    prevAmountRem = amountRemaining
+    let maxSaved = 0
+    let maxRepayScheme = {}
+    let amountUsed = 0
+    // eslint-disable-next-line no-loop-func
+    loans.forEach((loan) => {
+      if (finalRepayScheme[loan.id]) {
+        return
+      }
 
-  return maxRepayScheme
+      const repayScheme = {
+        [loan.id]: { repayAmount: amountRemaining },
+      }
+
+      const savedAmount = getSavedAmount(loans, repayScheme, date)
+      repayScheme[loan.id].saved = savedAmount
+
+      if (savedAmount > maxSaved) {
+        maxSaved = savedAmount
+        maxRepayScheme = repayScheme
+        amountUsed =
+          maxRepayScheme[loan.id].amountUsed ??
+          maxRepayScheme[loan.id].repayAmount
+      }
+    })
+    amountRemaining -= amountUsed
+    console.log({ date, maxRepayScheme, amountRemaining })
+    finalRepayScheme = {
+      ...finalRepayScheme,
+      ...maxRepayScheme,
+    }
+  }
+
+  return finalRepayScheme
 }
 
 export const getEntireSuggestions = (loans, repayAmount, repayStartDate) => {
-  // let adjustedLoans = adjustLoans(loans, repayStartDate)
-  // let endDate = getLoansEndDate(adjustedLoans)
-
-  // const suggestions = []
-  // const months = monthsDifference(repayStartDate, endDate)
-  // for (let i = 0; i < months; i++) {
-  //   const date = monthsIncrease(repayStartDate, i)
-  //   const repayScheme = getDateSuggestion(adjustedLoans, repayAmount, date)
-  //   suggestions.push({
-  //     date,
-  //     repayScheme,
-  //   })
-  //   adjustedLoans = applyRepayScheme(adjustedLoans, repayScheme)
-  // }
-
-  const suggestions = getSuggestions(loans, repayAmount, repayStartDate)
-
-  return suggestions
-}
-
-const getSuggestions = (loans, repayAmount, repayStartDate) => {
   let adjustedLoans = adjustLoans(loans, repayStartDate)
   let endDate = getLoansEndDate(adjustedLoans)
-  const months = monthsDifference(repayStartDate, endDate)
 
-  const dp = {}
-  dp[-1] = {}
-  adjustedLoans.forEach((loan, i) => {
-    dp[i] = {}
-    for (let j = 0; j < months; j++) {
-      const loans = j ? dp[i][j - 1].loans : adjustedLoans
-      const repayScheme = {
-        [loan.id]: { repayAmount },
-      }
-      // console.log(i, j)
-      // console.log(loans, repayScheme)
-      const savedAmount = getSavedAmount(loans, repayScheme)
-      const prevMonthMax = j ? dp[i][j - 1].saved : 0
-      const prevLoanMax = i ? dp[i - 1][j].loanMax : 0
-      const prevLoanRepaySchemeMax = i ? dp[i - 1][j].loanRepaySchemeMax : {}
-      repayScheme[loan.id].saved = savedAmount
-
-      // console.log({ savedAmount, prevMonthMax, prevLoanMax })
-
-      dp[i][j] = {
-        saved: prevMonthMax + Math.max(savedAmount, prevLoanMax),
-        loans: applyRepayScheme(
-          loans,
-          savedAmount > prevLoanMax ? repayScheme : prevLoanRepaySchemeMax
-        ),
-        loanMax: Math.max(prevLoanMax, savedAmount),
-        repayScheme,
-        loanRepaySchemeMax:
-          savedAmount > prevLoanMax ? repayScheme : prevLoanRepaySchemeMax,
-        savedThisMonth: Math.max(savedAmount, prevLoanMax),
-      }
-
-      // console.log(dp[i][j])
-      // console.log('-----------------------------')
-    }
-  })
-
-  console.log(dp)
   const suggestions = []
-  for (let j = 0; j < months; j++) {
-    const date = monthsIncrease(repayStartDate, j)
+  const months = monthsDifference(repayStartDate, endDate)
+  for (let i = 0; i < months; i++) {
+    if (adjustedLoans.length === 0) {
+      break
+    }
+    const date = monthsIncrease(repayStartDate, i)
+    const repayScheme = getDateSuggestion(adjustedLoans, repayAmount, date)
     suggestions.push({
       date,
-      repayScheme: dp[adjustedLoans.length - 1][j].loanRepaySchemeMax,
+      repayScheme,
     })
+    const appliedScheme = applyRepayScheme(adjustedLoans, repayScheme)
+    adjustedLoans = appliedScheme.loans
+    repayAmount += appliedScheme.closedAccountsEmi
   }
 
-  console.log({ suggestions })
   return suggestions
 }

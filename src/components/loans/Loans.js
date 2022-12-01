@@ -8,6 +8,7 @@ import generateUniqueId from 'generate-unique-id'
 import Table from '../table/Table'
 import Modal from '../modal/Modal'
 import Box from '../box/Box'
+import { roundTwoDecimals } from '../helpers/util'
 
 const headers = [
   'Name',
@@ -111,12 +112,12 @@ const Loans = ({ loans, setLoans }) => {
 
       startDate = `${month} ${startDate.year()}`
       return [
-        loan.name ?? '--',
-        loan.amount ?? '--',
+        loan.name ?? '-',
+        loan.amount == null ? '-' : roundTwoDecimals(loan.amount),
         startDate ?? '--',
         loan.loanTenure ?? '--',
         loan.interestRate ?? '--',
-        loan.emi ?? '--',
+        loan.emi == null ? '-' : roundTwoDecimals(loan.emi),
         loan.prePaymentCharges ?? '--',
         loan.prePaymentChargesDuration ?? '--',
         <Stack direction='row' spacing={0}>

@@ -1,4 +1,4 @@
-import { monthsDifference, monthsIncrease, roundTwoDecimals } from './util'
+import { monthsDifference, monthsIncrease } from './util'
 
 export const calculateEmi = (principle, interest, loanTenure) => {
   const p = principle
@@ -101,11 +101,10 @@ export const adjustLoans = (loans, date) => {
   This function returns the adjusted loans after applying the repayScheme
 */
 export const applyRepayScheme = (loans, repayScheme, date) => {
-  return loans
+  let closedAccountsEmi = 0
+  const appliedLoans = loans
     .map((loan) => {
-      // console.log('Apply:', loan, repayScheme)
       const repayAmount = applyPrepaymentCharges(loan, repayScheme, date)
-      // console.log('Applu RepayAmount:', repayAmount)
       const interest = (loan.amount * loan.interestRate) / 1200
       const amount = Math.max(
         0,
@@ -117,20 +116,16 @@ export const applyRepayScheme = (loans, repayScheme, date) => {
         loan.emi
       ).loanTenure
       if (!amount || !loanTenure) {
+        closedAccountsEmi += loan.emi
         return null
       }
 
-      // console.log('Return Apply:', {
-      //   ...loan,
-      //   amount,
-      //   loanTenure,
-      // })
-
       return {
         ...loan,
-        amount: roundTwoDecimals(amount),
+        amount: amount,
         loanTenure,
       }
     })
     .filter((loan) => !!loan)
+  return { loans: appliedLoans, closedAccountsEmi }
 }
