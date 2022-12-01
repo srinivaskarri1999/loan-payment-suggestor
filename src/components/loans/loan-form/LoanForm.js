@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import { useEffect, useState } from 'react'
-import { calculateEmi } from '../../util'
+import { calculateEmi } from '../../helpers/loans'
 
 const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }) => {
   const [emiChanged, setEmiChanged] = useState(false)

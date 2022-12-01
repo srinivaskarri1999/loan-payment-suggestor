@@ -1,4 +1,5 @@
-import { getEntireSuggestions } from '../util'
+import { getEntireSuggestions } from '../helpers/suggestions'
+import { roundTwoDecimals } from '../helpers/util'
 
 export const suggestionInitialValues = {
   repayAmount: undefined,
@@ -27,6 +28,7 @@ export const getRepaySchedule = (loans, repay) => {
     repay.repayAmount,
     repay.repayStartDate
   )
+  let totalSaved = 0
   const data = []
   suggestions.forEach((suggestion) => {
     const month = suggestion.date.toLocaleString('en-US', {
@@ -37,15 +39,23 @@ export const getRepaySchedule = (loans, repay) => {
     let saved = 0
     loans.forEach((loan) => {
       if (suggestion.repayScheme[loan.id]) {
-        row.push(suggestion.repayScheme[loan.id].repayAmount || '--')
+        let amount =
+          suggestion.repayScheme[loan.id].amountUsed ??
+          suggestion.repayScheme[loan.id].repayAmount
+        if (amount) {
+          amount = roundTwoDecimals(amount)
+        }
+
+        row.push(amount || '-')
         saved += suggestion.repayScheme[loan.id].saved || 0
       } else {
-        row.push('--')
+        row.push('-')
       }
     })
-    row.push(saved)
+    totalSaved += saved
+    row.push(roundTwoDecimals(saved))
     data.push(row)
   })
-  console.log('Date:', data)
+  data.push(['', '', '', '', totalSaved])
   return data
 }
