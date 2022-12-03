@@ -96,7 +96,6 @@ export const getDateSuggestion = (loans, repayAmount, date) => {
       }
     })
     amountRemaining -= amountUsed
-    console.log({ date, maxRepayScheme, amountRemaining })
     finalRepayScheme = {
       ...finalRepayScheme,
       ...maxRepayScheme,
@@ -118,11 +117,11 @@ export const getEntireSuggestions = (loans, repayAmount, repayStartDate) => {
     }
     const date = monthsIncrease(repayStartDate, i)
     const repayScheme = getDateSuggestion(adjustedLoans, repayAmount, date)
+    const appliedScheme = applyRepayScheme(adjustedLoans, repayScheme)
     suggestions.push({
       date,
       repayScheme,
     })
-    const appliedScheme = applyRepayScheme(adjustedLoans, repayScheme)
     adjustedLoans = appliedScheme.loans
     repayAmount += appliedScheme.closedAccountsEmi
   }
