@@ -117,6 +117,10 @@ export const applyRepayScheme = (loans, repayScheme, date) => {
       ).loanTenure
       if (!amount || !loanTenure) {
         closedAccountsEmi += loan.emi
+        if (!repayScheme[loan.id]) {
+          repayScheme[loan.id] = {}
+        }
+        repayScheme[loan.id].accountClosed = true
         return null
       }
 

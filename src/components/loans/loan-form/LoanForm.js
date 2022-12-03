@@ -22,7 +22,14 @@ const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }) => {
         emi: calculateEmi(form.amount, form.interestRate, form.loanTenure),
       })
     }
-  }, [form.amount, form.interestRate, form.loanTenure])
+  }, [
+    form.amount,
+    form.interestRate,
+    form.loanTenure,
+    emiChanged,
+    form,
+    setForm,
+  ])
 
   const handleChange = (name) => (e) => {
     if (name === 'emi') {

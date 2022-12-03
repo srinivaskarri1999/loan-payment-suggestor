@@ -12,7 +12,7 @@ import {
 import { StyledTableCell, StyledTableRow } from './Table.style'
 import { extractText } from './util'
 
-const Table = ({ headers, rows, noData, downloadable }) => {
+const Table = ({ headers, rows, noData, downloadable, lastRowColor }) => {
   const handleCSV = (fileName) => {
     const tableData = extractText([headers, ...rows])
       .map((row) => row.map((cell) => `"${cell}"`).join(','))
@@ -54,7 +54,13 @@ const Table = ({ headers, rows, noData, downloadable }) => {
           <TableBody>
             {rows && rows.length ? (
               rows.map((row, i) => (
-                <StyledTableRow key={`cell-${i}`}>
+                <StyledTableRow
+                  key={`cell-${i}`}
+                  sx={{
+                    backgroundColor:
+                      i === rows.length - 1 ? lastRowColor : undefined,
+                  }}
+                >
                   {row.map((cell, j) => (
                     <StyledTableCell
                       align={j ? 'right' : 'left'}

@@ -8,7 +8,7 @@ import generateUniqueId from 'generate-unique-id'
 import Table from '../table/Table'
 import Modal from '../modal/Modal'
 import Box from '../box/Box'
-import { roundTwoDecimals } from '../helpers/util'
+import { formatLoan } from '../helpers/format'
 
 const headers = [
   'Name',
@@ -111,15 +111,16 @@ const Loans = ({ loans, setLoans }) => {
       })
 
       startDate = `${month} ${startDate.year()}`
+      const formattedLoan = formatLoan(loan)
       return [
-        loan.name ?? '-',
-        loan.amount == null ? '-' : roundTwoDecimals(loan.amount),
+        formattedLoan.name ?? '-',
+        formattedLoan.amount ?? '-',
         startDate ?? '--',
-        loan.loanTenure ?? '--',
-        loan.interestRate ?? '--',
-        loan.emi == null ? '-' : roundTwoDecimals(loan.emi),
-        loan.prePaymentCharges ?? '--',
-        loan.prePaymentChargesDuration ?? '--',
+        formattedLoan.loanTenure ?? '--',
+        formattedLoan.interestRate ?? '--',
+        formattedLoan.emi ?? '-',
+        formattedLoan.prePaymentCharges ?? '--',
+        formattedLoan.prePaymentChargesDuration ?? '--',
         <Stack direction='row' spacing={0}>
           <IconButton size='small' onClick={handleEdit.bind(this, loan)}>
             <Edit />

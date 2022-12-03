@@ -68,7 +68,7 @@ const Suggestion = ({ loans }) => {
           <Stack direction='row' spacing={3}>
             <FormControl>
               <TextField
-                label='Repay amount'
+                label='Extra amount'
                 type='number'
                 value={form.repayAmount}
                 onChange={handleChange('repayAmount')}
@@ -77,6 +77,7 @@ const Suggestion = ({ loans }) => {
                   shrink: true,
                 }}
                 required
+                helperText='Additional amount excluding EMI'
               />
             </FormControl>
             <FormControl>
@@ -94,6 +95,7 @@ const Suggestion = ({ loans }) => {
               onClick={handleCalculate}
               disabled={!loans || loans.length === 0}
               variant='contained'
+              sx={{ height: '50px' }}
             >
               Calcutale
             </Button>
@@ -109,6 +111,7 @@ const Suggestion = ({ loans }) => {
                 rows={tableData}
                 noData='No Data.'
                 downloadable
+                lastRowColor='rgba(51, 153, 255, 0.16)'
               />
             )}
         </Grid>
