@@ -13,9 +13,7 @@ module.exports = function (_env, argv) {
     devtool: !isProduction && 'eval-source-map',
     output: {
       path: path.resolve(__dirname, 'dist'),
-      filename: isProduction
-        ? 'static/js/[name].js'
-        : 'static/js/[name].chunk.js',
+      filename: isProduction ? 'index.js' : 'index.chunk.js',
       publicPath: '/',
     },
     devServer: {
