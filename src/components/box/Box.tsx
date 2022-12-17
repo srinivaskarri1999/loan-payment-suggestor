@@ -1,6 +1,12 @@
 import { Divider, Paper, Stack, Typography } from '@mui/material'
 
-const Box = ({ children, actions, title }) => {
+type Props = {
+  title: string
+  actions?: React.ReactNode
+  children: React.ReactNode
+}
+
+const Box = ({ children, actions, title }: Props) => {
   return (
     <Paper elevation={6} sx={{ padding: '24px', paddingBottom: '64px' }}>
       {(title || actions) && (

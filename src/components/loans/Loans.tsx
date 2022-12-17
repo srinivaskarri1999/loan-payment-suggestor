@@ -1,14 +1,24 @@
 import { Delete, Edit } from '@mui/icons-material'
 import { Button, Stack, Typography, IconButton } from '@mui/material'
 import { useState } from 'react'
-import { isValid, loanFormInitialValues, parseValues } from './loan-form/util'
+import {
+  isValid,
+  LoanFormInitialValues,
+  loanFormInitialValues,
+} from './loan-form/util'
 import LoanForm from './loan-form/LoanForm'
 import dayjs from 'dayjs'
 import generateUniqueId from 'generate-unique-id'
 import Table from '../table/Table'
 import Modal from '../modal/Modal'
 import Box from '../box/Box'
-import { formatLoan } from '../helpers/format'
+import { formatAmount, formatInterestRate } from '../helpers/format'
+import { Loan } from '../helpers'
+
+type Props = {
+  loans: Loan[]
+  setLoans: (loans: Loan[]) => void
+}
 
 const headers = [
   'Name',
@@ -22,18 +32,13 @@ const headers = [
   'Actions',
 ]
 
-const getFormInititalValue = () => {
-  return {
-    ...loanFormInitialValues,
-    startDate: dayjs(Date()),
-  }
-}
-
-const Loans = ({ loans, setLoans }) => {
-  const [newLoan, setNewLoan] = useState(getFormInititalValue())
-  const [editLoan, setEditLoan] = useState(false)
-  const [open, setOpen] = useState(false)
-  const [deleteLoan, setDeleteLoan] = useState(null)
+const Loans = ({ loans, setLoans }: Props) => {
+  const [newLoan, setNewLoan] = useState<LoanFormInitialValues>(
+    loanFormInitialValues
+  )
+  const [editLoan, setEditLoan] = useState<boolean>(false)
+  const [open, setOpen] = useState<boolean>(false)
+  const [deleteLoan, setDeleteLoan] = useState<Loan | null>(null)
 
   const toggleModal = () => {
     setOpen(!open)
@@ -46,10 +51,10 @@ const Loans = ({ loans, setLoans }) => {
   const handleClose = () => {
     setOpen(false)
     setEditLoan(false)
-    setNewLoan(getFormInititalValue)
+    setNewLoan(loanFormInitialValues)
   }
 
-  const handleDeleteModal = (loan) => {
+  const handleDeleteModal = (loan: Loan | null) => {
     setDeleteLoan(loan)
   }
 
@@ -71,20 +76,21 @@ const Loans = ({ loans, setLoans }) => {
     if (!isValid(newLoan, setNewLoan)) {
       return
     }
-    const parsedLoan = parseValues(newLoan)
+    const { notValid, ...parseLoan } = { ...newLoan }
+    const isEdit = !!newLoan.id
 
-    if (newLoan.id) {
+    if (isEdit) {
       // Edit loan
-      const index = loans.findIndex((loan) => loan.id === parsedLoan.id)
+      const index = loans.findIndex((loan) => loan.id === newLoan.id)
       if (index > -1) {
-        loans[index] = parsedLoan
+        loans[index] = parseLoan
         setLoans(loans)
       }
     } else {
       // Add loan
       const loan = {
         id: generateUniqueId({ length: 32 }),
-        ...parsedLoan,
+        ...parseLoan,
       }
       setLoans([...loans, loan])
     }
@@ -92,7 +98,7 @@ const Loans = ({ loans, setLoans }) => {
     handleClose()
   }
 
-  const handleEdit = (loan) => {
+  const handleEdit = (loan: Loan) => {
     setNewLoan({
       ...loan,
       startDate: dayjs(loan.startDate),
@@ -104,23 +110,22 @@ const Loans = ({ loans, setLoans }) => {
 
   const getRows = () => {
     return loans.map((loan) => {
-      let startDate = dayjs(loan.startDate)
+      const startDate = dayjs(loan.startDate)
       const date = new Date(startDate.toISOString())
       const month = date.toLocaleString('en-US', {
         month: 'long',
       })
 
-      startDate = `${month} ${startDate.year()}`
-      const formattedLoan = formatLoan(loan)
+      const startDateString = `${month} ${startDate.year()}`
       return [
-        formattedLoan.name ?? '-',
-        formattedLoan.amount ?? '-',
-        startDate ?? '--',
-        formattedLoan.loanTenure ?? '--',
-        formattedLoan.interestRate ?? '--',
-        formattedLoan.emi ?? '-',
-        formattedLoan.prePaymentCharges ?? '--',
-        formattedLoan.prePaymentChargesDuration ?? '--',
+        loan.name ?? '-',
+        formatAmount(loan.amount),
+        startDateString ?? '--',
+        loan.loanTenure ?? '--',
+        formatInterestRate(loan.interestRate),
+        formatAmount(loan.emi),
+        formatInterestRate(loan.prePaymentCharges),
+        loan.prePaymentChargesDuration ?? '--',
         <Stack direction='row' spacing={0}>
           <IconButton size='small' onClick={handleEdit.bind(this, loan)}>
             <Edit />

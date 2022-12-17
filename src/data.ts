@@ -1,4 +1,6 @@
-export const theme = {
+import { ThemeOptions } from '@mui/material'
+
+export const theme: ThemeOptions = {
   breakpoints: {
     keys: ['xs', 'sm', 'md', 'lg', 'xl'],
     values: {
@@ -27,27 +29,6 @@ export const theme = {
         disableElevation: true,
       },
       styleOverrides: {},
-      variants: [
-        {
-          props: {
-            variant: 'code',
-          },
-        },
-        {
-          props: {
-            variant: 'link',
-          },
-        },
-      ],
-    },
-    MuiIconButton: {
-      variants: [
-        {
-          props: {
-            color: 'primary',
-          },
-        },
-      ],
     },
     MuiMenu: {
       styleOverrides: {},
@@ -78,12 +59,6 @@ export const theme = {
       styleOverrides: {},
     },
     MuiSelect: {
-      defaultProps: {
-        IconComponent: {
-          type: {},
-          compare: null,
-        },
-      },
       styleOverrides: {
         iconFilled: {
           top: 'calc(50% - .25em)',
@@ -166,23 +141,9 @@ export const theme = {
       contrastText: 'rgba(0, 0, 0, 0.87)',
     },
     divider: 'rgba(194, 224, 255, 0.08)',
-    primaryDark: {
-      50: '#E2EDF8',
-      100: '#CEE0F3',
-      200: '#91B9E3',
-      300: '#5090D3',
-      400: '#265D97',
-      500: '#1E4976',
-      600: '#173A5E',
-      700: '#132F4C',
-      800: '#001E3C',
-      900: '#0A1929',
-      main: '#5090D3',
-    },
     background: {
       default: '#001E3C',
       paper: '#0A1929',
-      defaultChannel: '18 18 18',
     },
     common: {
       black: '#1D1D1D',
@@ -192,9 +153,6 @@ export const theme = {
       primary: '#fff',
       secondary: '#B2BAC2',
       disabled: 'rgba(255, 255, 255, 0.5)',
-      icon: 'rgba(255, 255, 255, 0.5)',
-      primaryChannel: '255 255 255',
-      secondaryChannel: '255 255 255',
     },
     grey: {
       50: '#F3F6F9',
@@ -207,8 +165,6 @@ export const theme = {
       700: '#3E5060',
       800: '#2D3843',
       900: '#1A2027',
-      main: '#132F4C',
-      contrastText: '#6F7E8C',
       A100: '#f5f5f5',
       A200: '#eeeeee',
       A400: '#bdbdbd',
@@ -288,8 +244,6 @@ export const theme = {
       focus: 'rgba(255, 255, 255, 0.12)',
       focusOpacity: 0.12,
       activatedOpacity: 0.24,
-      activeChannel: '255 255 255',
-      selectedChannel: '255 255 255',
     },
   },
   shape: {
@@ -298,13 +252,6 @@ export const theme = {
   typography: {
     fontFamily:
       '"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
-    fontFamilyCode: 'Menlo,Consolas,"Droid Sans Mono",monospace',
-    fontFamilyTagline:
-      '"PlusJakartaSans-ExtraBold",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
-    fontFamilySystem:
-      '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
-    fontWeightSemiBold: 600,
-    fontWeightExtraBold: 800,
     h1: {
       fontFamily:
         '"PlusJakartaSans-ExtraBold",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"',
@@ -432,14 +379,6 @@ export const theme = {
       scrollMarginTop: 'calc(var(--MuiDocs-header-height) + 32px)',
     },
   },
-  nprogress: {
-    color: '#3399FF',
-  },
-  props: {
-    MuiBadge: {
-      overlap: 'rectangular',
-    },
-  },
   mixins: {
     toolbar: {
       minHeight: 56,
@@ -507,4 +446,4 @@ export const theme = {
     snackbar: 1400,
     tooltip: 1500,
   },
-};
+}

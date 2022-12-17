@@ -9,11 +9,20 @@ import {
   TextField,
 } from '@mui/material'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
-import { useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { calculateEmi } from '../../helpers/loans'
+import { formatValue, LoanFormInitialValues } from './util'
 
-const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }) => {
-  const [emiChanged, setEmiChanged] = useState(false)
+type Props = {
+  form: LoanFormInitialValues
+  setForm: (form: LoanFormInitialValues) => void
+  handleClose: () => void
+  handleAdd: () => void
+  edit: boolean
+}
+
+const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }: Props) => {
+  const [emiChanged, setEmiChanged] = useState<boolean>(false)
 
   useEffect(() => {
     if (!emiChanged && form.amount && form.interestRate && form.loanTenure) {
@@ -31,23 +40,29 @@ const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }) => {
     setForm,
   ])
 
-  const handleChange = (name) => (e) => {
-    if (name === 'emi') {
-      setEmiChanged(true)
+  const handleChange =
+    (name: keyof Omit<LoanFormInitialValues, 'notValid'>) =>
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | null) => {
+      if (name === 'emi') {
+        setEmiChanged(true)
+      }
+
+      let value
+      if (e && e.currentTarget) {
+        value = e.currentTarget.value
+      } else {
+        value = e
+      }
+
+      setForm({
+        ...form,
+        [name]: formatValue(name, value as string),
+      })
     }
 
-    let value = e
-    if (e.target) {
-      value = e.target.value
-    }
-
-    setForm({
-      ...form,
-      [name]: value,
-    })
-  }
-
-  const getAdornment = (name) => {
+  const getAdornment = (
+    name: keyof Omit<LoanFormInitialValues, 'notValid'>
+  ): React.ReactNode => {
     switch (name) {
       case 'amount': {
         return <InputAdornment position='start'>₹</InputAdornment>
@@ -122,7 +137,6 @@ const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }) => {
                 }}
               />
             )}
-            required
           />
         </FormControl>
       </Grid>
@@ -221,7 +235,7 @@ const LoanForm = ({ form, setForm, handleClose, handleAdd, edit }) => {
       <Grid item xs={4}>
         <Button
           onClick={handleClose}
-          variant='outline'
+          variant='outlined'
           sx={{ border: 'solid white 1px' }}
           fullWidth
         >

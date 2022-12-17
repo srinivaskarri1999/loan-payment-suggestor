@@ -3,7 +3,7 @@ import { Container, Grid, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 
 const Compare = () => {
-  const [dots, setDots] = useState('')
+  const [dots, setDots] = useState<string>('')
 
   useEffect(() => {
     const timer = setTimeout(() => {
