@@ -8,10 +8,17 @@ import {
   ListItemText,
 } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
-import { mainListItems } from './data'
 import { Drawer, DrawerHeader } from './Sidebar.style'
+import { MainListItem, mainListItems } from './data'
 
-function Sidebar({ open, toggleDrawer, handleSection, section }) {
+type Props = {
+  open: boolean
+  toggleDrawer: () => void
+  handleSection: (section: MainListItem) => void
+  section: MainListItem
+}
+
+function Sidebar({ open, toggleDrawer, handleSection, section }: Props) {
   return (
     <>
       <Drawer variant='permanent' open={open}>

@@ -12,10 +12,28 @@ import {
 import { StyledTableCell, StyledTableRow } from './Table.style'
 import { extractText } from './util'
 
-const Table = ({ headers, rows, noData, downloadable, lastRowColor }) => {
-  const handleCSV = (fileName) => {
-    const tableData = extractText([headers, ...rows])
-      .map((row) => row.map((cell) => `"${cell}"`).join(','))
+type Props = {
+  headers: React.ReactNode[]
+  rows?: React.ReactNode[][]
+  noData?: React.ReactNode
+  downloadable?: boolean
+  lastRowColor?: string
+}
+
+const Table = ({
+  headers,
+  rows,
+  noData,
+  downloadable,
+  lastRowColor,
+}: Props) => {
+  const handleCSV = (fileName: string) => {
+    const data = [headers]
+    if (rows) {
+      data.push(...rows)
+    }
+    const tableData = extractText(data)
+      .map((row: unknown[]) => row.map((cell) => `"${cell}"`).join(','))
       .join('\n')
     const downloadLink = document.createElement('a')
     const blob = new Blob([tableData])
@@ -83,7 +101,7 @@ const Table = ({ headers, rows, noData, downloadable, lastRowColor }) => {
                     sx={{ width: '100%' }}
                     textAlign='center'
                   >
-                    {noData}
+                    {noData || 'No Data.'}
                   </Typography>
                 </StyledTableCell>
               </StyledTableRow>

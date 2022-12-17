@@ -1,12 +1,13 @@
+import React from 'react'
 import * as ReactDomServer from 'react-dom/server'
 import { StaticRouter } from 'react-router-dom/server'
 
-export const extractText = (data) => {
+export const extractText = (data: unknown[]) => {
   if (!Array.isArray(data)) return data
 
-  const elementToString = (element) => {
+  const elementToString = (element: React.ReactNode) => {
     return ReactDomServer.renderToStaticMarkup(
-      <StaticRouter>{element}</StaticRouter>
+      <StaticRouter location={''}>{element}</StaticRouter>
     ).replace(/<[^>]+>/g, '')
   }
 

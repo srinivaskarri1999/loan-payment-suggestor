@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "public": false,
+  "github": {
+    "enabled": false
+  },
+  "builds": [
+    {
+      "src": "dist/**/*",
+      "use": "@vercel/static"
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*).(js|css|ico|svg|png|jpg)",
+      "destination": "/dist/$1.$2"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dist/index.html"
+    }
+  ]
+}

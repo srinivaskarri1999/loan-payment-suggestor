@@ -7,23 +7,30 @@ import {
   getLoanStats,
   reversePrepaymentCharges,
 } from './loans'
+import { Loan, RepayScheme } from '.'
 
 /* 
 This function will find the the total amount saved when payment is done with `repayScheme` on `date`
-repayScheme = {
-  [loan.id] : {
-    repayAmount: 5000
-  }
-}
 */
-const getSavedAmount = (loans, repayScheme, date) => {
+const getSavedAmount = (
+  loans: Loan[],
+  repayScheme: RepayScheme,
+  date: Date
+) => {
   if (!repayScheme || !loans) {
     return 0
   }
 
   let savedAmount = 0
   loans.forEach((loan) => {
-    if (!repayScheme || !repayScheme[loan.id]) {
+    if (
+      !loan.id ||
+      !loan.amount ||
+      !loan.interestRate ||
+      !loan.emi ||
+      !repayScheme ||
+      !repayScheme[loan.id]
+    ) {
       return
     }
     const repayAmount = applyPrepaymentCharges(loan, repayScheme, date)
@@ -64,23 +71,27 @@ const getSavedAmount = (loans, repayScheme, date) => {
   return savedAmount
 }
 
-export const getDateSuggestion = (loans, repayAmount, date) => {
-  let finalRepayScheme = {}
+export const getDateSuggestion = (
+  loans: Loan[],
+  repayAmount: number,
+  date: Date
+) => {
+  let finalRepayScheme: RepayScheme = {}
   let amountRemaining = repayAmount
   let prevAmountRem = 0
 
   while (amountRemaining > 0.1 && prevAmountRem !== amountRemaining) {
     prevAmountRem = amountRemaining
     let maxSaved = 0
-    let maxRepayScheme = {}
+    let maxRepayScheme: RepayScheme = {}
     let amountUsed = 0
     // eslint-disable-next-line no-loop-func
     loans.forEach((loan) => {
-      if (finalRepayScheme[loan.id]) {
+      if (!loan.id || finalRepayScheme[loan.id]) {
         return
       }
 
-      const repayScheme = {
+      const repayScheme: RepayScheme = {
         [loan.id]: { repayAmount: amountRemaining },
       }
 
@@ -105,9 +116,13 @@ export const getDateSuggestion = (loans, repayAmount, date) => {
   return finalRepayScheme
 }
 
-export const getEntireSuggestions = (loans, repayAmount, repayStartDate) => {
+export const getEntireSuggestions = (
+  loans: Loan[],
+  repayAmount: number,
+  repayStartDate: Date
+) => {
   let adjustedLoans = adjustLoans(loans, repayStartDate)
-  let endDate = getLoansEndDate(adjustedLoans)
+  const endDate = getLoansEndDate(adjustedLoans)
 
   const suggestions = []
   const months = monthsDifference(repayStartDate, endDate)
@@ -117,7 +132,7 @@ export const getEntireSuggestions = (loans, repayAmount, repayStartDate) => {
     }
     const date = monthsIncrease(repayStartDate, i)
     const repayScheme = getDateSuggestion(adjustedLoans, repayAmount, date)
-    const appliedScheme = applyRepayScheme(adjustedLoans, repayScheme)
+    const appliedScheme = applyRepayScheme(adjustedLoans, repayScheme, date)
     suggestions.push({
       date,
       repayScheme,

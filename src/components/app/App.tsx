@@ -2,20 +2,20 @@ import { Box, CssBaseline } from '@mui/material'
 import { useState } from 'react'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { mainListItems } from '../sidebar/data'
+import { MainListItem, mainListItems } from '../sidebar/data'
 import Sidebar from '../sidebar/Sidebar'
 import { DrawerHeader } from '../sidebar/Sidebar.style'
 import Topbar from '../topbar/Topbar'
 
 const App = () => {
-  const [open, setOpen] = useState(true)
-  const [section, setSection] = useState(mainListItems[0])
+  const [open, setOpen] = useState<boolean>(true)
+  const [section, setSection] = useState<MainListItem>(mainListItems[0])
 
   const toggleDrawer = () => {
     setOpen(!open)
   }
 
-  const handleSection = (section) => {
+  function handleSection(this: string, section: MainListItem): void {
     setSection(section)
   }
 

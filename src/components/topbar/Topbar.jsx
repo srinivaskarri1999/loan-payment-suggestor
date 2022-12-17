@@ -2,6 +2,7 @@ import { IconButton, Toolbar, Typography } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu'
 import { AppBar } from './Topbar.style'
 
+// eslint-disable-next-line
 const Topbar = ({ open, toggleDrawer, title }) => {
   return (
     <>

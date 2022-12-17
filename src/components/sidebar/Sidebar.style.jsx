@@ -1,7 +1,4 @@
-import {
-  styled,
-  Drawer as MuiDrawer,
-} from '@mui/material'
+import { styled, Drawer as MuiDrawer } from '@mui/material'
 import { drawerWidth } from './data'
 
 const openedMixin = (theme) => ({

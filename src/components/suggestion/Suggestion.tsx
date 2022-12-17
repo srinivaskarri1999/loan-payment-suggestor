@@ -4,39 +4,46 @@ import { useLocalStorage } from '../hooks/useLocalStorage'
 import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 import dayjs from 'dayjs'
 import {
+  formatLocalStorage,
+  formatValue,
   getRepaySchedule,
   getRepayScheduleHeaders,
-  parseValues,
+  SuggestionInitialValues,
   suggestionInitialValues,
 } from './util'
 import Table from '../table/Table'
-import { useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
+import { Loan } from '../helpers'
 
-const Suggestion = ({ loans }) => {
-  const [form, setForm] = useLocalStorage('_suggestionInputs', {
-    ...suggestionInitialValues,
-    repayStartDate: dayjs(Date()),
-  })
-  const [tableHeaders, setTableHeaders] = useState([])
-  const [tableData, setTableData] = useState()
+const Suggestion = ({ loans }: { loans: Loan[] }) => {
+  const [form, setForm] = useLocalStorage<
+    SuggestionInitialValues,
+    Record<keyof Omit<SuggestionInitialValues, 'notValid'>, string>
+  >('_suggestionInputs', suggestionInitialValues, formatLocalStorage)
+  const [tableHeaders, setTableHeaders] = useState<React.ReactNode[]>([])
+  const [tableData, setTableData] = useState<React.ReactNode[][]>()
 
-  const handleChange = (name) => (e) => {
-    let value = e
-    if (e.target) {
-      value = e.target.value
+  const handleChange =
+    (name: keyof Omit<SuggestionInitialValues, 'notValid'>) =>
+    (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | null) => {
+      let value
+      if (e && e.currentTarget) {
+        value = e.currentTarget.value
+      } else {
+        value = e
+      }
+
+      setForm({
+        ...form,
+        [name]: formatValue(name, value as string),
+      })
     }
-
-    setForm({
-      ...form,
-      [name]: value,
-    })
-  }
 
   const isValid = () => {
     let valid = true
     const notValid = { ...suggestionInitialValues.notValid }
 
-    if (!form.repayAmount && !isNaN(form.repayAmount)) {
+    if (!form.repayAmount || isNaN(form.repayAmount)) {
       valid = false
       notValid.repayAmount = true
     }
@@ -54,7 +61,7 @@ const Suggestion = ({ loans }) => {
     if (!isValid()) {
       return
     }
-    const parsedForm = parseValues(form)
+    const { notValid, ...parsedForm } = { ...form }
     const repaySchedule = getRepaySchedule(loans, parsedForm)
     const repayScheduleHeaders = getRepayScheduleHeaders(loans)
     setTableHeaders(repayScheduleHeaders)
@@ -88,7 +95,6 @@ const Suggestion = ({ loans }) => {
                 value={form.repayStartDate}
                 onChange={handleChange('repayStartDate')}
                 renderInput={(params) => <TextField {...params} />}
-                required
               />
             </FormControl>
             <Button
